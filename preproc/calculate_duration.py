@@ -35,7 +35,7 @@ def is_end_event(event_type):
 
 
 def save_durations(task_id_to_duration):
-    with open('durations.csv', 'w') as f:
+    with open('data/task_durations.csv', 'w') as f:
         for task_id in task_id_to_duration:
             f.write("%s,%s"%(task_id, task_id_to_duration[task_id]))
 
@@ -44,16 +44,31 @@ def transform_features(df):
     """
     Transform column of dicts 'resource_request' into two separate columns 'cpus' and 'memory'.
     """
+    print("Begin feature transformation...")
     cpus = []
     memory = []
+    cpu_error_count = 0
+    memory_error_count = 0
     for _, row in df.iterrows():
-        cpus.append(row["resource_request"]["cpus"])
-        memory.append(row["resource_request"]["memory"])
+        try:
+            cpus.append(row["resource_request"]["cpus"])
+        except TypeError:  # float is not subscriptable, sometimes row["resource_request"] is nan
+            cpus.append(None)
+            cpu_error_count += 1
+        try:
+            memory.append(row["resource_request"]["memory"])
+        except TypeError:
+            memory.append(None)
+            memory_error_count += 1
+    print("ERROR REPORT: Transform features:")
+    print(f"\t - CPU errors: {cpu_error_count}/{len(df)}={100*cpu_error_count/len(df)}%")
+    print(f"\t - Memory errors: {memory_error_count}/{len(df)}={100*memory_error_count/len(df)}%")
     return cpus, memory
 
 
 def calculate_task_duration(fname):
     df = pd.read_json(fname, lines=True)
+    print("Loaded dataframe...")
 
     # add new columns
     cpus, memory = transform_features(df)
@@ -66,7 +81,14 @@ def calculate_task_duration(fname):
 
     task_id_to_duration = {}
 
+    ten_percent_milestone = len(task_ids) // 10
+    count = 0
+
     for task_id in task_ids:
+        if count % ten_percent_milestone == 0:
+            print(f"Task id #{count}/{len(task_ids)}")
+        count += 1
+
         task_events = df.loc[df["task_id"] == task_id]
         task_events.sort_values(by="time")
 
