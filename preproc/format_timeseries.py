@@ -10,4 +10,4 @@ def format_timeseries(instance_events_fname):
 
 
 if __name__ == "__main__":
-    format_timeseries("data/instance_events_naive_collection_ids_less_12335081865.json")
+    format_timeseries("data/instance_events_naive_collection_ids_less_12335081865_w_task_id.json")
