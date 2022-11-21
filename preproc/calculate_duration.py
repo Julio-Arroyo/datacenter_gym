@@ -1,6 +1,5 @@
 """Calculate duration of each task"""
 
-import csv
 import pandas as pd
 from enum import Enum
 
@@ -85,6 +84,7 @@ def calculate_task_duration(fname):
     count = 0
 
     for task_id in task_ids:
+        print(f"Task id #{count}/{len(task_ids)}")
         if count % ten_percent_milestone == 0:
             print(f"Task id #{count}/{len(task_ids)}")
         count += 1
@@ -119,4 +119,4 @@ def calculate_task_duration(fname):
 
 
 if __name__ == "__main__":
-    calculate_task_duration("data/instance_events_naive_collection_ids_less_12335081865_w_task_id.json")
+    calculate_task_duration("data/instance_events_naive_collection_ids_less_12335081865_w_task_id_only_relevant_events.json")
