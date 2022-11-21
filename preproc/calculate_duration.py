@@ -35,6 +35,7 @@ def is_end_event(event_type):
 
 def save_durations(task_id_to_duration):
     with open('data/task_durations.csv', 'w') as f:
+        # TODO: need to add column headers?
         for task_id in task_id_to_duration:
             f.write("%s,%s"%(task_id, task_id_to_duration[task_id]))
 
@@ -115,7 +116,6 @@ def calculate_task_duration(fname):
             task_id_to_duration[task_id] = duration
     
     save_durations(task_id_to_duration)
-
 
 
 if __name__ == "__main__":
