@@ -38,7 +38,8 @@ def format_timeseries(instance_events_fname, durations_fname):
         task_data = {
             "duration": task_id_to_duration[task_id],
             "priority": instance_event["priority"],
-            "cpus": instance_event["cpus"]
+            "cpus": instance_event["cpus"],
+            "machine_id": instance_event["machine_id"]
         }
         if not time in timeseries:
             timeseries[time] = {}

@@ -1,10 +1,10 @@
 """Calculate duration of each task"""
 
 import pandas as pd
-from enum import Enum
+from enum import IntEnum
 
 
-class InstanceEvent(Enum):
+class InstanceEvent(IntEnum):
     SUBMIT = 0
     QUEUE = 1
     ENABLE = 2
@@ -34,7 +34,7 @@ def is_end_event(event_type):
 
 
 def save_durations(task_id_to_duration):
-    with open('data/task_durations.csv', 'w') as f:
+    with open('data/task_durations2.csv', 'w') as f:
         # TODO: need to add column headers?
         for task_id in task_id_to_duration:
             f.write("%s,%s"%(task_id, task_id_to_duration[task_id]))
@@ -94,26 +94,24 @@ def calculate_task_duration(fname):
         task_events.sort_values(by="time")
 
         is_running = False
-        is_done = False
         start_time = None
         duration = 0
         for _, task_event in task_events.iterrows():
-            assert not is_done
             if not is_running:
                 if not is_start_event(task_event["type"]):
                     continue
                 start_time = task_event["time"]  # continue what to do when time = 0
                 is_running = True
             else:
-                assert is_pause_event(task_event["type"]) or is_end_event(task_event["type"])  # might have to continue if schedule while running for some reason
+                if not(is_pause_event(task_event["type"]) or is_end_event(task_event["type"])):
+                    continue
 
                 assert not start_time is None
                 duration += task_event["time"] - start_time
-
                 if is_end_event(task_event["type"]):
-                    is_done = True
+                    break
         
-            task_id_to_duration[task_id] = duration
+        task_id_to_duration[task_id] = duration
     
     save_durations(task_id_to_duration)
 
